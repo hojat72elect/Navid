@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "tsc && expo start",
+    "android": "tsc && expo start --android",
+    "ios": "tsc && expo start --ios",
+    "web": "tsc && expo start --web"
   },
   "dependencies": {
     "expo": "~52.0.18",
@@ -15,7 +15,10 @@
     "react-native": "0.76.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@types/react": "^18.3.16",
+    "@types/react-native": "^0.72.8",
+    "typescript": "^5.7.2"
   },
   "private": true
 }

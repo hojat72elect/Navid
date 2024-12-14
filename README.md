@@ -1,0 +1,1 @@
+This is a news stand app which allows the user to get all the latest news from various resources; in different languages.
