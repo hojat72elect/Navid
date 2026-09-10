@@ -2,6 +2,7 @@ import re
 import time
 from typing import List, Dict
 import requests
+from targets.Targets import TARGET_1
 
 class Fuzzer:
     """
@@ -325,8 +326,7 @@ class Fuzzer:
         return "\n".join(report)
 
 if __name__ == "__main__":
-    targetUrl = "https://leader.ir/"
-    fuzzer = Fuzzer(targetUrl, timeout=10)
+    fuzzer = Fuzzer(TARGET_1, timeout=10)
 
     # The endpoints that we want to test
     testCases = [
