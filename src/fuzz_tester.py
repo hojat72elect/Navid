@@ -1,9 +1,7 @@
 import re
 import time
 from typing import List, Dict
-
 import requests
-
 
 class Fuzzer:
     """
@@ -326,56 +324,40 @@ class Fuzzer:
 
         return "\n".join(report)
 
+if __name__ == "__main__":
+    targetUrl = "https://leader.ir/"
+    fuzzer = Fuzzer(targetUrl, timeout=10)
 
-def main():
-    """
-    Example usage of the ManualFuzzer
-    """
-    # Step 1: Define your target
-    target_url = "https://leader.ir/"  # Replace with your target
-
-    # Step 2: Initialize the fuzzer
-    fuzzer = Fuzzer(target_url, timeout=10)
-
-    # Step 3: Define endpoints to test
-    test_cases = [
-        # GET request with query parameters
+    # The endpoints that we want to test
+    testCases = [
         {
             'endpoint': '/search',
             'method': 'GET',
             'params': {'q': 'test'},
             'injection_types': ['sql_injection', 'xss']
         },
-        # POST request with form data
         {
             'endpoint': '/login',
             'method': 'POST',
             'data': {'username': 'test', 'password': 'test'},
             'injection_types': ['sql_injection', 'command_injection']
         },
-        # GET request without parameters (will add 'input' param)
         {
             'endpoint': '/api/users',
             'method': 'GET',
             'injection_types': ['sql_injection', 'path_traversal', 'ssrf']
         }
     ]
-
-    # Step 4: Run tests
-    all_results = []
-    for test_case in test_cases:
+    allResults = []
+    for testCase in testCases:
         result = fuzzer.testEndpoint(
-            endpoint=test_case['endpoint'],
-            method=test_case['method'],
-            params=test_case.get('params'),
-            data=test_case.get('data'),
-            injectionTypes=test_case.get('injection_types')
+            endpoint=testCase['endpoint'],
+            method=testCase['method'],
+            params=testCase.get('params'),
+            data=testCase.get('data'),
+            injectionTypes=testCase.get('injection_types')
         )
-        all_results.append(result)
+        allResults.append(result)
 
-    # Step 5: Generate and print report
-    report = fuzzer.generateReport(all_results)
+    report = fuzzer.generateReport(allResults)
     print(report)
-
-if __name__ == "__main__":
-    main()
