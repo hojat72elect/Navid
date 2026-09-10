@@ -2,7 +2,7 @@ import re
 import time
 from typing import List, Dict
 import requests
-from targets.Targets import TARGET_1
+from targets.Targets import TARGET_1, TARGET_1_ENDPOINTS
 
 class Fuzzer:
     """
@@ -134,7 +134,8 @@ class Fuzzer:
             method: str = 'GET',
             params: Dict | None = None,
             data: Dict | None = None,
-            injectionTypes: List[str] | None = None
+            injectionTypes: List[str] | None = None,
+            pathParamKey: str | None = None
     ) -> Dict:
 
         if injectionTypes is None:
@@ -161,24 +162,28 @@ class Fuzzer:
                 testParams = params.copy() if params else {}
                 testData = data.copy() if data else {}
 
-                if method == 'GET' and testParams:
-                    paramKey = list(testParams.keys())[0]
-                    testParams[paramKey] = payload
-                elif method == 'POST' and testData:
-                    dataKey = list(testData.keys())[0]
-                    testData[dataKey] = payload
-                elif method == 'GET':
-                    testParams = {'input': payload}
+                if pathParamKey:
+                    testUrl = fullUrl.replace(f'{{{pathParamKey}}}', payload)
                 else:
-                    testData = {'input': payload}
+                    testUrl = fullUrl
+                    if method == 'GET' and testParams:
+                        paramKey = list(testParams.keys())[0]
+                        testParams[paramKey] = payload
+                    elif method == 'POST' and testData:
+                        dataKey = list(testData.keys())[0]
+                        testData[dataKey] = payload
+                    elif method == 'GET':
+                        testParams = {'input': payload}
+                    else:
+                        testData = {'input': payload}
 
                 try:
                     startTime = time.time()
 
                     if method == 'GET':
-                        response = self.session.get(fullUrl, params=testParams, timeout=self.timeout, allow_redirects=False)
+                        response = self.session.get(testUrl, params=testParams, timeout=self.timeout, allow_redirects=False)
                     else:
-                        response = self.session.post(fullUrl, data=testData, timeout=self.timeout, allow_redirects=False)
+                        response = self.session.post(testUrl, data=testData, timeout=self.timeout, allow_redirects=False)
 
                     responseTime = time.time() - startTime
                     vulnerabilityInfo = self.analyzeResponse(response, payload, injectionType, responseTime)
@@ -331,13 +336,13 @@ if __name__ == "__main__":
     # The endpoints that we want to test
     testCases = [
         {
-            'endpoint': '/search',
+            'endpoint': TARGET_1_ENDPOINTS['search'],
             'method': 'GET',
-            'params': {'q': 'test'},
+            'path_param_key': 'query',
             'injection_types': ['sql_injection', 'xss']
         },
         {
-            'endpoint': '/login',
+            'endpoint': TARGET_1_ENDPOINTS['login'],
             'method': 'POST',
             'data': {'username': 'test', 'password': 'test'},
             'injection_types': ['sql_injection', 'command_injection']
@@ -355,7 +360,8 @@ if __name__ == "__main__":
             method=testCase['method'],
             params=testCase.get('params'),
             data=testCase.get('data'),
-            injectionTypes=testCase.get('injection_types')
+            injectionTypes=testCase.get('injection_types'),
+            pathParamKey=testCase.get('path_param_key')
         )
         allResults.append(result)
 
