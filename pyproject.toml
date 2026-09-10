@@ -6,7 +6,5 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "ipykernel>=7.3.0",
-    "mitmproxy>=12.2.3",
     "requests>=2.34.2",
-    "xsstrike>=3.2.2",
 ]
